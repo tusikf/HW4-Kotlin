@@ -21,17 +21,29 @@
 //Если isValid для команды возвращает false, выводим help. Если true, обрабатываем команду внутри when.
 sealed interface Command {
     fun isValid(str:String): Boolean
+    fun printCommand(str: String)
+
 
 }
 class Content(val title: String): Command {
     override fun isValid(str:String): Boolean {
         return false
     }
+    override fun printCommand(str: String) {
+        println(str)
+    }
+
     object Help: Command {
         override fun isValid(str:String): Boolean {
             if (str == "help") {
                 return true
             } else return false
+        }
+        override fun printCommand(str: String) {
+            println(str.toString())
+        }
+        override fun toString(): String {
+            return "Help"
         }
     }
     object Exit: Command {
@@ -39,6 +51,12 @@ class Content(val title: String): Command {
             if (str == "exit") {
                 return true
             } else return false
+        }
+        override fun printCommand(str: String) {
+            println(str)
+        }
+        override fun toString(): String {
+            return "Exit"
         }
     }
     object Add: Command {
@@ -76,7 +94,14 @@ class Content(val title: String): Command {
             }
             return false
         }
+        override fun printCommand(str: String) {
+            println(str)
+        }
+        override fun toString(): String {
+            return "Add"
+        }
     }
+
 
     //— Добавьте новую команду show, которая выводит последнее значение, введённой с помощью команды add.
     // Для этого значение должно быть сохранено в переменную типа Person. Если на момент выполнения команды show не было ничего введено,
@@ -86,6 +111,12 @@ class Content(val title: String): Command {
             if (str == "show") {
                 return true
             } else return false
+        }
+        override fun printCommand(str: String) {
+            println(str)
+        }
+        override fun toString(): String {
+            return "Show"
         }
     }
 }
@@ -140,7 +171,7 @@ fun main() {
         //Читаем команду с помощью функции readCommand
         val result: Command = readCommand(vvod)
         //Выводим на экран получившийся экземпляр Command
-        println(result.toString())
+        println("Введена команда: ${result}")
         //Если isValid для команды возвращает false, выводим help. Если true, обрабатываем команду внутри when.
         if (result.isValid(vvod)) {
             when (result) {
