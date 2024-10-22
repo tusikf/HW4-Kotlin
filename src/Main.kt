@@ -1,4 +1,7 @@
-//exit
+import kotlin.collections.MutableList
+import kotlin.collections.MutableList as MutableList1
+
+/* //exit
 //help
 //add <Имя> phone <Номер телефона>
 //add <Имя> email <Адрес электронной почты>
@@ -19,21 +22,20 @@
 //Читаем команду с помощью функции readCommand
 //Выводим на экран получившийся экземпляр Command
 //Если isValid для команды возвращает false, выводим help. Если true, обрабатываем команду внутри when.
+*/
+//— Измените класс Person так, чтобы он содержал список телефонов и список почтовых адресов, связанных с человеком.
+//— Теперь в телефонной книге могут храниться записи о нескольких людях. Используйте для этого наиболее подходящую структуру данных.
+//— Команда AddPhone теперь должна добавлять новый телефон к записи соответствующего человека.
+//— Команда AddEmail теперь должна добавлять новый email к записи соответствующего человека.
+//— Команда show должна принимать в качестве аргумента имя человека и выводить связанные с ним телефоны и адреса электронной почты.
+//— Добавьте команду find, которая принимает email или телефон и выводит список людей, для которых записано такое значение.
 sealed interface Command {
     fun isValid(str:String): Boolean
     fun printCommand(str: String)
 
 
 }
-class Content(val title: String): Command {
-    override fun isValid(str:String): Boolean {
-        return false
-    }
-    override fun printCommand(str: String) {
-        println(str)
-    }
-
-    object Help: Command {
+class Help(): Command {
         override fun isValid(str:String): Boolean {
             if (str == "help") {
                 return true
@@ -46,7 +48,7 @@ class Content(val title: String): Command {
             return "Help"
         }
     }
-    object Exit: Command {
+class Exit(): Command {
         override fun isValid(str:String): Boolean {
             if (str == "exit") {
                 return true
@@ -59,7 +61,7 @@ class Content(val title: String): Command {
             return "Exit"
         }
     }
-    object Add: Command {
+class Add(): Command {
         //Проверку телефона и email нужно перенести в эту функцию.
         override fun isValid(str:String): Boolean {
             val myArray: List<String> = str!!.split(" ")
@@ -101,14 +103,10 @@ class Content(val title: String): Command {
             return "Add"
         }
     }
-
-
-    //— Добавьте новую команду show, которая выводит последнее значение, введённой с помощью команды add.
-    // Для этого значение должно быть сохранено в переменную типа Person. Если на момент выполнения команды show не было ничего введено,
-    // нужно вывести на экран сообщение “Not initialized”.
-    object Show: Command {
+class Show(): Command {
         override fun isValid(str:String): Boolean {
-            if (str == "show") {
+            val myArray: List<String> = str!!.split(" ")
+            if (myArray[0] == "show") {
                 return true
             } else return false
         }
@@ -119,15 +117,22 @@ class Content(val title: String): Command {
             return "Show"
         }
     }
+class Find(): Command {
+    override fun isValid(str:String): Boolean {
+        val myArray: List<String> = str!!.split(" ")
+        if (myArray[0] == "find") {
+            return true
+        } else return false
+    }
+    override fun printCommand(str: String) {
+        println(str)
+    }
+    override fun toString(): String {
+        return "Find"
+    }
 }
-//— Создайте data класс Person, который представляет собой запись о человеке. Этот класс должен содержать поля:
-//name – имя человека
-//phone – номер телефона
-//email – адрес электронной почты
 data class Person(
-    val name: String,
-    val phone: String,
-    val email: String
+    val name: Map<String, Map<String, MutableList<String>>>
 )
 fun printHelp() {
     println("Введите команду в одном из вариантов: ")
@@ -135,36 +140,37 @@ fun printHelp() {
     println("help - подсказка")
     println("add Имя phone +7905...")
     println("add Имя email adress@mail.com")
+    println("show Имя - для вывода информации о контактах")
+    println("find Телефон или Email - поиск контакта с таким значением")
 }
 fun printPerson(person: Person) {
-    println("Имя: ${person.name} Номер телефона: ${person.phone} Email: ${person.email}")
+    println("Имя: " )
+            //"/*${person.name} Номер телефона: ${person.phone} Email: ${person.email}")
 }
 //— Напишите функцию readCommand(): Command, которая читает команду из текстового ввода, распознаёт её и возвращает
 // один из классов-наследников Command, соответствующий введённой команде.
 fun readCommand(string: String): Command {
     val myArray: List<String> = string!!.split(" ")
-    val command: Command
-    command = when {
-        myArray[0] == "exit" -> {
-            Content.Exit
-        }
-        myArray[0] == "help" -> {
-            Content.Help
-        }
-        myArray[0] == "add" -> {
-            Content.Add
-        }
-        myArray[0] == "show" -> {
-            Content.Show
-        }
-        else -> {
-            Content.Help
-        }
+    return when (myArray[0]){
+        "exit" -> Exit()
+        "help" -> Help()
+        "add" -> Add()
+        "show" -> Show()
+        "find" -> Find()
+        else -> Help()
     }
-    return command
+
 }
+
+
+
 fun main() {
-    var person = Person("0", "0", "0")
+    var person: Map<String, Map<String, MutableList<String>>> = mapOf(
+        "Иванов" to mapOf("phone" to mutableListOf("+789456123"), "email" to mutableListOf("first@email.ru")),
+        "Петров" to mapOf("phone" to mutableListOf("+712345678"), "email" to mutableListOf("second@email.ru")),
+        "Сидоров" to mapOf("phone" to mutableListOf("+789456123"), "email" to mutableListOf("first@email.ru"))
+        )
+    println(person)
     do {
         println("Введите команду:")
         val vvod:String = readlnOrNull().toString()
@@ -175,20 +181,65 @@ fun main() {
         //Если isValid для команды возвращает false, выводим help. Если true, обрабатываем команду внутри when.
         if (result.isValid(vvod)) {
             when (result) {
-                is Content -> printHelp()
-                Content.Exit -> println("Goodby!")
-                Content.Help -> printHelp()
-                Content.Add -> {
+                is Exit -> println("Goodby!")
+                is Help -> printHelp()
+                //— Команда AddPhone теперь должна добавлять новый телефон к записи соответствующего человека.
+                //— Команда AddEmail теперь должна добавлять новый email к записи соответствующего человека.
+                is Add -> {
                     val myArray: List<String> = vvod!!.split(" ")
-                    when (myArray[2]) {
-                        "phone" -> person = Person(myArray[1], myArray[3], "-")
-                        "email" -> person = Person(myArray[1], "-", myArray[3])
+                    for (i in person.keys) {
+                        if (i == myArray[1]) {
+                            when (myArray[2]) {
+                                "phone" -> {
+                                    val list1 = person.getValue(myArray[1]).getValue("phone")
+                                    list1.add(myArray[3])
+                                    //person = put(i to put("phone" to list1)
+                                }
+                                "email" -> {
+                                    //person = put(i to put("email" to list1)
+                                }
+                            }
+                        }
+
                     }
+
                 }
-                Content.Show -> {
-                    if (person.name == "0") {
-                        println("Not initialized")
-                    } else printPerson(person)
+                //— Команда show должна принимать в качестве аргумента имя человека и выводить
+                // связанные с ним телефоны и адреса электронной почты.
+                is Show -> {
+                    val myArrayShow: List<String> = vvod!!.split(" ")
+                    val name1: String = myArrayShow[1].toString()
+                    println("Контакт $name1: ")
+                    println(person.getValue(myArrayShow[1]))
+                    }
+                //— Команда show должна принимать в качестве аргумента имя человека и выводить связанные с ним
+                // телефоны и адреса электронной почты.
+                is Find -> {
+                    val myArrayFind1: List<String> = vvod!!.split(" ")
+                    val myArrayFind2: List<String> = vvod!!.split("@")
+                    if (myArrayFind2.size > 1) {
+                        println("Искомый email есть у контактов:")
+                        val resultat = mutableListOf("")
+                        for (i in person.keys) {
+                            val a: Map<String, List<String>> = person.getValue(i)
+                            if (a.getValue(key = "email").contains(myArrayFind1[1])) {
+                                resultat.add(i)
+                            }
+                            println(resultat.removeAt(0))
+                        }
+                    } else {
+                        println("Искомый номер телефона есть у контактов:")
+                        val resultat = mutableListOf("")
+                        for (i in person.keys) {
+                            val a: Map<String, List<String>> = person.getValue(i)
+                            if (a.getValue(key = "phone").contains(myArrayFind1[1])) {
+                                resultat.add(i)
+                            }
+                            println(resultat.removeAt(0))
+                        }
+                    }
+
+
                 }
             }
         } else {
