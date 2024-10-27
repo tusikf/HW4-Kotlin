@@ -1,3 +1,4 @@
+import javax.swing.UIManager.put
 import kotlin.collections.MutableList
 import kotlin.collections.MutableList as MutableList1
 
@@ -132,7 +133,7 @@ class Find(): Command {
     }
 }
 data class Person(
-    val name: Map<String, Map<String, MutableList<String>>>
+    val name: MutableMap<String, MutableMap<String, MutableList<String>>>
 )
 fun printHelp() {
     println("Введите команду в одном из вариантов: ")
@@ -162,13 +163,11 @@ fun readCommand(string: String): Command {
 
 }
 
-
-
 fun main() {
-    var person: Map<String, Map<String, MutableList<String>>> = mapOf(
-        "Иванов" to mapOf("phone" to mutableListOf("+789456123"), "email" to mutableListOf("first@email.ru")),
-        "Петров" to mapOf("phone" to mutableListOf("+712345678"), "email" to mutableListOf("second@email.ru")),
-        "Сидоров" to mapOf("phone" to mutableListOf("+789456123"), "email" to mutableListOf("first@email.ru"))
+    var person: MutableMap<String, MutableMap<String, MutableList<String>>> = mutableMapOf(
+        "Иванов" to mutableMapOf("phone" to mutableListOf("+789456123"), "email" to mutableListOf("first@email.ru")),
+        "Петров" to mutableMapOf("phone" to mutableListOf("+712345678"), "email" to mutableListOf("second@email.ru")),
+        "Сидоров" to mutableMapOf("phone" to mutableListOf("+789456123"), "email" to mutableListOf("first@email.ru"))
         )
     println(person)
     do {
@@ -191,12 +190,18 @@ fun main() {
                         if (i == myArray[1]) {
                             when (myArray[2]) {
                                 "phone" -> {
+                                    var map1: MutableMap<String, MutableList<String>> = person.getValue(myArray[1])
                                     val list1 = person.getValue(myArray[1]).getValue("phone")
                                     list1.add(myArray[3])
-                                    //person = put(i to put("phone" to list1)
+                                    map1.put("phone", list1)
+                                    person.put(i, map1)
                                 }
                                 "email" -> {
-                                    //person = put(i to put("email" to list1)
+                                    var map2: MutableMap<String, MutableList<String>> = person.getValue(myArray[1])
+                                    val list2 = person.getValue(myArray[1]).getValue("email")
+                                    list2.add(myArray[3])
+                                    map2.put("email", list2)
+                                    person.put(i, map2)
                                 }
                             }
                         }
