@@ -1,6 +1,8 @@
-import javax.swing.UIManager.put
-import kotlin.collections.MutableList
-import kotlin.collections.MutableList as MutableList1
+
+import java.io.File
+import java.util.*
+import kotlin.collections.ArrayDeque
+
 
 /* //exit
 //help
@@ -23,13 +25,22 @@ import kotlin.collections.MutableList as MutableList1
 //Читаем команду с помощью функции readCommand
 //Выводим на экран получившийся экземпляр Command
 //Если isValid для команды возвращает false, выводим help. Если true, обрабатываем команду внутри when.
-*/
 //— Измените класс Person так, чтобы он содержал список телефонов и список почтовых адресов, связанных с человеком.
 //— Теперь в телефонной книге могут храниться записи о нескольких людях. Используйте для этого наиболее подходящую структуру данных.
 //— Команда AddPhone теперь должна добавлять новый телефон к записи соответствующего человека.
 //— Команда AddEmail теперь должна добавлять новый email к записи соответствующего человека.
 //— Команда show должна принимать в качестве аргумента имя человека и выводить связанные с ним телефоны и адреса электронной почты.
-//— Добавьте команду find, которая принимает email или телефон и выводит список людей, для которых записано такое значение.
+//— Добавьте команду find, которая принимает email или телефон и выводит список людей, для которых записано такое значение.*/
+
+//— Добавьте новую команду export, которая экспортирует добавленные значения в текстовый файл в формате JSON.
+// Команда принимает путь к новому файлу. Например
+    //export /Users/user/myfile.json
+//— Реализуйте DSL на Kotlin, который позволит конструировать JSON и преобразовывать его в строку.
+//— Используйте этот DSL для экспорта данных в файл.
+//— Выходной JSON не обязательно должен быть отформатирован, поля объектов могут идти в любом порядке.
+// Главное, чтобы он имел корректный синтаксис. Такой вывод тоже принимается:
+//[{""emails"": [""ew@huh.ru""],""name"": ""Alex"",""phones"": [""34355"",""847564""]},{""emails"": [],""name"": ""Tom"",""phones"": [""84755""]}]
+
 sealed interface Command {
     fun isValid(str:String): Boolean
     fun printCommand(str: String)
@@ -163,6 +174,22 @@ fun readCommand(string: String): Command {
 
 }
 
+// DSL
+data class User(val name: String, val phone: List<String>, val email: List<String>)
+data class UserBuilder {
+    var name: String? = null
+    var phone: List<String>? = null
+    var email: List<String>? = null
+    fun build(): User {
+        checkNotNull(name) { "name must be assigned." }
+        checkNotNull(phone) { "age must be assigned." }
+        checkNotNull(email) { "hands must be assigned." }
+        return User(name!!, phone!!, email!!)
+    }
+}
+fun user(initializer: UserBuilder.() -> Unit): User
+        =  UserBuilder().apply(initializer).build()
+
 fun main() {
     var person: MutableMap<String, MutableMap<String, MutableList<String>>> = mutableMapOf(
         "Иванов" to mutableMapOf("phone" to mutableListOf("+789456123"), "email" to mutableListOf("first@email.ru")),
@@ -170,6 +197,16 @@ fun main() {
         "Сидоров" to mutableMapOf("phone" to mutableListOf("+789456123"), "email" to mutableListOf("first@email.ru"))
         )
     println(person)
+
+
+//запись в файл
+    val file = File("myfile.json")
+    val text = "здесь потом будет json"
+    file.writeText(text, Charsets.UTF_8)
+
+
+
+
     do {
         println("Введите команду:")
         val vvod:String = readlnOrNull().toString()
@@ -252,5 +289,7 @@ fun main() {
         }
     } while (vvod != "exit")
 }
+
+
 
 
