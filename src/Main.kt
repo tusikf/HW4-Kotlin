@@ -1,7 +1,5 @@
 
 import java.io.File
-import java.util.*
-import kotlin.collections.ArrayDeque
 
 
 /* //exit
@@ -34,7 +32,7 @@ import kotlin.collections.ArrayDeque
 
 //— Добавьте новую команду export, которая экспортирует добавленные значения в текстовый файл в формате JSON.
 // Команда принимает путь к новому файлу. Например
-    //export /Users/user/myfile.json
+//export /Users/user/myfile.json
 //— Реализуйте DSL на Kotlin, который позволит конструировать JSON и преобразовывать его в строку.
 //— Используйте этот DSL для экспорта данных в файл.
 //— Выходной JSON не обязательно должен быть отформатирован, поля объектов могут идти в любом порядке.
@@ -48,87 +46,87 @@ sealed interface Command {
 
 }
 class Help(): Command {
-        override fun isValid(str:String): Boolean {
-            if (str == "help") {
-                return true
-            } else return false
-        }
-        override fun printCommand(str: String) {
-            println(str.toString())
-        }
-        override fun toString(): String {
-            return "Help"
-        }
+    override fun isValid(str:String): Boolean {
+        if (str == "help") {
+            return true
+        } else return false
     }
+    override fun printCommand(str: String) {
+        println(str.toString())
+    }
+    override fun toString(): String {
+        return "Help"
+    }
+}
 class Exit(): Command {
-        override fun isValid(str:String): Boolean {
-            if (str == "exit") {
-                return true
-            } else return false
-        }
-        override fun printCommand(str: String) {
-            println(str)
-        }
-        override fun toString(): String {
-            return "Exit"
-        }
+    override fun isValid(str:String): Boolean {
+        if (str == "exit") {
+            return true
+        } else return false
     }
+    override fun printCommand(str: String) {
+        println(str)
+    }
+    override fun toString(): String {
+        return "Exit"
+    }
+}
 class Add(): Command {
-        //Проверку телефона и email нужно перенести в эту функцию.
-        override fun isValid(str:String): Boolean {
-            val myArray: List<String> = str!!.split(" ")
-            val plus:String = "+"
-            if (myArray.size >= 4) {
-                when {
-                    myArray[2] == "phone" -> {
-                        if (myArray[3].matches(Regex("""[0-9]+""")) || myArray[3].startsWith(plus)) {
+    //Проверку телефона и email нужно перенести в эту функцию.
+    override fun isValid(str:String): Boolean {
+        val myArray: List<String> = str!!.split(" ")
+        val plus:String = "+"
+        if (myArray.size >= 4) {
+            when {
+                myArray[2] == "phone" -> {
+                    if (myArray[3].matches(Regex("""[0-9]+""")) || myArray[3].startsWith(plus)) {
+                        return true
+                    } else {
+                        return false
+                    }
+                }
+
+                myArray[2] == "email" -> {
+                    val slovo1: List<String> = myArray[3].split("@")
+                    if (slovo1.size == 2) {
+                        val slovo2: List<String> = slovo1[1].split(".")
+                        if (slovo1.size == 2 && slovo2.size == 2) {
                             return true
                         } else {
                             return false
                         }
+                    } else {
+                        return false
                     }
 
-                    myArray[2] == "email" -> {
-                        val slovo1: List<String> = myArray[3].split("@")
-                        if (slovo1.size == 2) {
-                            val slovo2: List<String> = slovo1[1].split(".")
-                            if (slovo1.size == 2 && slovo2.size == 2) {
-                                return true
-                            } else {
-                                return false
-                            }
-                        } else {
-                            return false
-                        }
-
-                    }
                 }
-            } else {
-                return false
             }
+        } else {
             return false
         }
-        override fun printCommand(str: String) {
-            println(str)
-        }
-        override fun toString(): String {
-            return "Add"
-        }
+        return false
     }
+    override fun printCommand(str: String) {
+        println(str)
+    }
+    override fun toString(): String {
+        return "Add"
+    }
+}
 class Show(): Command {
-        override fun isValid(str:String): Boolean {
-            val myArray: List<String> = str!!.split(" ")
-            if (myArray[0] == "show") {
-                return true
-            } else return false
-        }
-        override fun printCommand(str: String) {
-            println(str)
-        }
-        override fun toString(): String {
-            return "Show"
-        }
+    override fun isValid(str:String): Boolean {
+        val myArray: List<String> = str!!.split(" ")
+        if (myArray[0] == "show") {
+            return true
+        } else return false
     }
+    override fun printCommand(str: String) {
+        println(str)
+    }
+    override fun toString(): String {
+        return "Show"
+    }
+}
 class Find(): Command {
     override fun isValid(str:String): Boolean {
         val myArray: List<String> = str!!.split(" ")
@@ -143,6 +141,21 @@ class Find(): Command {
         return "Find"
     }
 }
+class Export(): Command {
+    override fun isValid(str:String): Boolean {
+        val myArray: List<String> = str!!.split(" ")
+        if (myArray[0] == "export") {
+            return true
+        } else return false
+    }
+    override fun printCommand(str: String) {
+        println(str)
+    }
+    override fun toString(): String {
+        return "Export"
+    }
+}
+
 data class Person(
     val name: MutableMap<String, MutableMap<String, MutableList<String>>>
 )
@@ -154,10 +167,11 @@ fun printHelp() {
     println("add Имя email adress@mail.com")
     println("show Имя - для вывода информации о контактах")
     println("find Телефон или Email - поиск контакта с таким значением")
+    println("export Имя - выведет данные контакта в файл")
 }
 fun printPerson(person: Person) {
     println("Имя: " )
-            //"/*${person.name} Номер телефона: ${person.phone} Email: ${person.email}")
+    //"/*${person.name} Номер телефона: ${person.phone} Email: ${person.email}")
 }
 //— Напишите функцию readCommand(): Command, которая читает команду из текстового ввода, распознаёт её и возвращает
 // один из классов-наследников Command, соответствующий введённой команде.
@@ -169,42 +183,25 @@ fun readCommand(string: String): Command {
         "add" -> Add()
         "show" -> Show()
         "find" -> Find()
+        "export" -> Export()
         else -> Help()
     }
 
 }
 
 // DSL
-data class User(val name: String, val phone: List<String>, val email: List<String>)
-data class UserBuilder {
-    var name: String? = null
-    var phone: List<String>? = null
-    var email: List<String>? = null
-    fun build(): User {
-        checkNotNull(name) { "name must be assigned." }
-        checkNotNull(phone) { "age must be assigned." }
-        checkNotNull(email) { "hands must be assigned." }
-        return User(name!!, phone!!, email!!)
-    }
-}
-fun user(initializer: UserBuilder.() -> Unit): User
-        =  UserBuilder().apply(initializer).build()
-
+data class User(var name: String? = null,
+                var phone: List<String>? = null,
+                var email: List<String>? = null)
 fun main() {
+    fun user(block: User.() -> Unit): User = User().apply(block)
+
     var person: MutableMap<String, MutableMap<String, MutableList<String>>> = mutableMapOf(
         "Иванов" to mutableMapOf("phone" to mutableListOf("+789456123"), "email" to mutableListOf("first@email.ru")),
         "Петров" to mutableMapOf("phone" to mutableListOf("+712345678"), "email" to mutableListOf("second@email.ru")),
         "Сидоров" to mutableMapOf("phone" to mutableListOf("+789456123"), "email" to mutableListOf("first@email.ru"))
-        )
+    )
     println(person)
-
-
-//запись в файл
-    val file = File("myfile.json")
-    val text = "здесь потом будет json"
-    file.writeText(text, Charsets.UTF_8)
-
-
 
 
     do {
@@ -253,7 +250,7 @@ fun main() {
                     val name1: String = myArrayShow[1].toString()
                     println("Контакт $name1: ")
                     println(person.getValue(myArrayShow[1]))
-                    }
+                }
                 //— Команда show должна принимать в качестве аргумента имя человека и выводить связанные с ним
                 // телефоны и адреса электронной почты.
                 is Find -> {
@@ -282,6 +279,20 @@ fun main() {
                     }
 
 
+                }
+                is Export -> {
+                    val myArrayShow: List<String> = vvod!!.split(" ")
+                    val b: Map<String, List<String>> = person.getValue(myArrayShow[1])
+                    val contact1: List<String> = b.getValue(key = "phone")
+                    val contact2: List<String> = b.getValue(key = "email")
+                    val user = user {
+                        name = myArrayShow[1]
+                        phone = contact1
+                        email = contact2
+                    }
+                    val file = File("myfile.json")
+                    val text = user
+                    file.writeText(text.toString(), Charsets.UTF_8)
                 }
             }
         } else {
